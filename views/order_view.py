@@ -48,3 +48,16 @@ def single_order(pk):
 
         serialized_order = json.dumps(dict(query_results))
     return serialized_order
+
+def new_order(order):
+    with sqlite3.connect('./kneeldiamonds.sqlite3') as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute(
+            """
+            INSERT INTO Orders (metal_id, style_id, size_id)
+            VALUES (?,?,?)
+            """,
+            (order['metal_id'], order['style_id'], order['size_id'])
+        )
+    return True if db_cursor.rowcount > 0 else False
