@@ -61,3 +61,16 @@ def new_order(order):
             (order['metal_id'], order['style_id'], order['size_id'])
         )
     return True if db_cursor.rowcount > 0 else False
+
+def remove_order(pk):
+    with sqlite3.connect('./kneeldiamonds.sqlite3') as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute(
+            """
+            DELETE FROM Orders WHERE id = ?
+            """,(pk,)
+        )
+        number_of_rows_deleted = db_cursor.rowcount
+    return True if number_of_rows_deleted > 0 else False
