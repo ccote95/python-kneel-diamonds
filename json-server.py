@@ -2,7 +2,7 @@ import json
 from http.server import HTTPServer
 from nss_handler import HandleRequests, status
 
-from views import list_orders, single_order, new_order,remove_order
+from views import list_orders, single_order, new_order,remove_order, update_metal
 
 class JSONServer(HandleRequests):
 
@@ -55,6 +55,21 @@ class JSONServer(HandleRequests):
                 if successfully_deleted:
                     return self.response("", status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
                 return self.response("Requested resource was not found", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
+            
+    def do_PUT(self):
+         url = self.parse_url(self.path)
+         pk = url["pk"]
+
+         content_len = int(self.headers.get('content-length',0))
+         request_body = self.rfile.read(content_len)
+         request_body = json.loads(request_body)
+
+         if url["requested_resource"] == "metals":
+             if pk !=0:
+                 successfully_updated = update_metal(pk, request_body)
+                 if successfully_updated:
+                     return self.response("", status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
+
 
 
         
