@@ -2,7 +2,7 @@ import json
 from http.server import HTTPServer
 from nss_handler import HandleRequests, status
 
-from views import list_orders, single_order, new_order
+from views import list_orders, single_order, new_order,remove_order
 
 class JSONServer(HandleRequests):
 
@@ -42,6 +42,21 @@ class JSONServer(HandleRequests):
                 self.send_header('Content-Type','application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps({'message': 'Failed to create order'}))
+
+
+    def do_DELETE(self):
+
+        url = self.parse_url(self.path)
+        pk = url["pk"]
+
+        if url["requested_resource"] == "orders":
+            if pk != 0:
+                successfully_deleted = remove_order(pk)
+                if successfully_deleted:
+                    return self.response("", status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
+                return self.response("Requested resource was not found", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
+
+
         
 
 
