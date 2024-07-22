@@ -6,25 +6,54 @@ def list_orders():
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
 
+
         db_cursor.execute(
             """
             SELECT
-                o.id,
+                o.id AS order_id,
                 o.metal_id,
+                m.metal AS metal_name,
+                m.price AS metal_price,
                 o.size_id,
-                o.style_id
-            FROM Orders O
+                s.carets AS size_carets,
+                s.pricce AS size_price,
+                o.style_id,
+                st.style AS style_name,
+                st.price AS style_price
+            FROM Orders o
+            JOIN Metals m ON m.id = o.metal_id
+            JOIN Sizes s ON s.id = o.size_id
+            JOIN Styles st ON st.id = o.style_id
             """
         )
         query_results = db_cursor.fetchall()
 
-        orders=[]
+        orders = []
         for row in query_results:
-            orders.append(dict(row))
+            order = {
+                'order_id': row['order_id'],
+                'metal': {
+                    'id': row['metal_id'],
+                    'name': row['metal_name'],
+                    'price': row['metal_price']
+                },
+                'size': {
+                    'id': row['size_id'],
+                    'carets': row['size_carets'],
+                    'price': row['size_price']
+                },
+                'style': {
+                    'id': row['style_id'],
+                    'name': row['style_name'],
+                    'price': row['style_price']
+                }
+            }
+            orders.append(order)
 
         serialized_orders = json.dumps(orders)
 
     return serialized_orders
+
 
 
 
